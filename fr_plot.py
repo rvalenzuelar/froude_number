@@ -54,8 +54,10 @@ ftxt = home + '/BALLOON/case09/FRS_200301{}.tsv'
 
 median500 = []
 mean500 = []
+max500 = []
 median1000 = []
 mean1000 = []
+max1000 = []
 for name in sfiles:
     df = mf.parse_sounding2(ftxt.format(name))
     bvf = pd.DataFrame(index=df.index, columns=['bvf'])
@@ -65,27 +67,35 @@ for name in sfiles:
 
     median500.append(np.sqrt(bvf.loc[0:500].median()))
     mean500.append(np.sqrt(bvf.loc[0:500].mean()))
+    max500.append(np.sqrt(bvf.loc[0:500].max()))
     median1000.append(np.sqrt(bvf.loc[0:1000].median()))
     mean1000.append(np.sqrt(bvf.loc[0:1000].mean()))
+    max1000.append(np.sqrt(bvf.loc[0:1000].max()))
 
 median500 = np.squeeze(np.array(median500))
 mean500 = np.squeeze(np.array(mean500))
+max500 = np.squeeze(np.array(max500))
 median1000 = np.squeeze(np.array(median1000))
 mean1000 = np.squeeze(np.array(mean1000))
+max1000 = np.squeeze(np.array(max1000))
 
 fig, ax = plt.subplots(figsize=(8, 7))
 c = ax.contour(UU, NN, Fr0500, [1.0], colors='b')
 plt.clabel(c, fmt='H = 0.5 km', manual=[(15, 0.03)])
 c = ax.contour(UU, NN, Fr1000, [1.0], colors='g')
 plt.clabel(c, fmt='H =1.0 km', manual=[(15, 0.03)])
-ax.scatter(Up, mean500, marker='o', s=100, facecolor='none',
-           color='b', label='mean 0.5 km')
-ax.scatter(Up, mean1000, marker='s', s=100,  facecolor='none',
-           color='g', label='mean 1.0 km')
-ax.scatter(Up, median500, marker='x', s=100, color='b',
+ax.scatter(Up, mean500, marker='o', s=100, color='b',
+           facecolor='none', label='mean 0.5 km')
+ax.scatter(Up, mean1000, marker='o', s=100, color='g',
+           facecolor='none', label='mean 1.0 km')
+ax.scatter(Up, median500, marker='+', s=100, color='b',
            label='median 0.5 km')
 ax.scatter(Up, median1000, marker='+', s=100, color='g',
            label='median 1.0 km')
+# ax.scatter(Up, max500, marker='x', s=100, color='b',
+#            label='max 0.5 km')
+# ax.scatter(Up, max1000, marker='x', s=100, color='g',
+#            label='max 1.0 km')
 ax.set_xlim([minU, maxU])
 ax.set_ylim([minN, maxN])
 
