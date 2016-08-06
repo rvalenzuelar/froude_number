@@ -12,6 +12,8 @@ rcParams['xtick.labelsize'] = 15
 rcParams['ytick.labelsize'] = 15
 rcParams['axes.labelsize'] = 15
 rcParams['legend.handletextpad'] = 0.1
+rcParams['legend.handlelength'] = 1.
+rcParams['legend.fontsize'] = 15
 rcParams['mathtext.default'] = 'sf'
 
 #home = os.path.expanduser('~')
@@ -56,19 +58,20 @@ def get_bvf(flist=None,stat=None,layer=None):
 def main():
     minU, maxU = [0, 20]
     minN, maxN = [5e-5, 5e-2]
-    U = np.linspace(minU, maxU, 1000)  # [m s-1]
-    N = np.linspace(minN, maxN, 1000)  # [s-1]
+#    U = np.linspace(minU, maxU, 1000)  # [m s-1]
+#    N = np.linspace(minN, maxN, 1000)  # [s-1]
     
-    UU, NN = np.meshgrid(U, N)
+#    UU, NN = np.meshgrid(U, N)
     
-    Fr0500 = UU/(NN*500)
-    Fr1000 = UU/(NN*1000)
+#    Fr0500 = UU/(NN*500)
+#    Fr1000 = UU/(NN*1000)
     
     ''' estimates of spd and dir from PPIs and RHIs at range
-    where maximum Doppler is clear; usually it is at
-    the same time than sounding but if not clear then
-    choosed the neares PPI time. If Doppler is absent
-    or not clear within an hour then uses NaN '''
+        where maximum Doppler is clear; usually it is at
+        the same time than sounding but if not clear then
+        choosed the neares PPI time. If Doppler is absent
+        or not clear within an hour then uses NaN 
+    '''
     ppi_wspd_c09 = np.array([15, 15, 18, 15, 13]+[np.nan]*3)
     ppi_wdir_c09 = np.array([170, 170, 170, 180, 200]+[np.nan]*3)
     rhi_wspd_c09 = np.array([10, 10, 15, 10, 10]+[np.nan]*3)
@@ -103,15 +106,14 @@ def main():
     medianc13[0,:] = get_bvf(flist=sfiles,stat=stat,layer=[0,500])
     medianc13[1,:] = get_bvf(flist=sfiles,stat=stat,layer=[0,1000])
     
-    with sns.axes_style("white"):
+    with sns.axes_style('white'):
+        sns.set_style('ticks',
+                      {'xtick.direction': u'in',
+                       'ytick.direction': u'in'}
+                      )
         fig, ax = plt.subplots(figsize=(6, 6))
     
-    c = ax.contour(UU, NN, Fr0500, [1.0], colors='k',linestyles=':')
-    plt.clabel(c, fmt='h = 0.5 km', manual=[(15, 0.03)])
-    
-    c = ax.contour(UU, NN, Fr1000, [1.0], colors='k',linestyles='-')
-    plt.clabel(c, fmt='h = 1.0 km', manual=[(15, 0.03)]) 
-    
+       
     ax.scatter(Up_c09, medianc09[0], marker='+', s=100, color='b',lw=2,
                label='21-23Jan03 0.5 km'.format(stat))
     
@@ -124,29 +126,49 @@ def main():
     ax.scatter(Up_c13, medianc13[1], marker='x', s=100, color='g',lw=2,
                 label='16-18Feb04 1.0 km'.format(stat))
 
-    ax.annotate("",
-                xy=(0.64, 0.67), xycoords='figure fraction',
-                xytext=(0.74, 0.62), textcoords='figure fraction',
-                arrowprops=dict(arrowstyle="->",
-                                connectionstyle="arc3,rad=0.3",
-                                lw=2),
-                )
-    ax.text(0.6,0.66,'blocked',transform=ax.transAxes,
-            ha='right',fontsize=15)
-    ax.annotate("",
-                xy=(0.72, 0.46), xycoords='figure fraction',
-                xytext=(0.75, 0.58), textcoords='figure fraction',
-                arrowprops=dict(arrowstyle="->",
-                                connectionstyle="arc3,rad=-0.3",
-                                lw=2),
-                )
-    ax.text(0.72,0.41,'unblocked',transform=ax.transAxes,
-            ha='center',va='top',fontsize=15)
+    ax.plot(np.arange(21),np.arange(21)/500.,'b--',lw=2,
+            label='h = 0.5 km')    
+    
+    ax.plot(np.arange(21),np.arange(21)/1000.,'g-',lw=2,
+            label='h = 1.0 km') 
+
+    ''' arrows annotation '''
+#    ax.annotate("",
+#                xy=(0.64, 0.67), xycoords='figure fraction',
+#                xytext=(0.74, 0.62), textcoords='figure fraction',
+#                arrowprops=dict(arrowstyle="->",
+#                                connectionstyle="arc3,rad=0.3",
+#                                lw=2),
+#                )
+#    ax.text(0.6,0.66,'blocked',transform=ax.transAxes,
+#            ha='right',fontsize=15)
+#    ax.annotate("",
+#                xy=(0.72, 0.46), xycoords='figure fraction',
+#                xytext=(0.75, 0.58), textcoords='figure fraction',
+#                arrowprops=dict(arrowstyle="->",
+#                                connectionstyle="arc3,rad=-0.3",
+#                                lw=2),
+#                )
+#    ax.text(0.72,0.41,'unblocked',transform=ax.transAxes,
+#            ha='center',va='top',fontsize=15)
+
+    ''' simple annotations '''
+    ax.text(20,0.041,'blocked',weight='bold',ha='right',
+            fontsize=15,rotation=40,color='b')
+    ax.text(20,0.037,'unblocked',weight='bold',ha='right',
+            fontsize=15,rotation=40,color='b')
+    ax.text(20,0.021,'blocked',weight='bold',ha='right',
+            fontsize=15,rotation=20,color='g')
+    ax.text(20,0.017,'unblocked',weight='bold',ha='right',
+            fontsize=15,rotation=20,color='g')
+
 
     ax.set_xlim([minU, maxU])
     ax.set_ylim([minN, maxN])
     
-    plt.legend(loc=2, scatterpoints=1,fontsize=15)
+    handles, labels = ax.get_legend_handles_labels()
+    ax.legend(handles[::-1], labels[::-1], loc=2)           
+
     plt.xlabel(r'U [$m s^{-1}$]')
     plt.ylabel(r'N [$s^{-1}$]')
     plt.title('Froude number (Fr=U/Nh)',fontsize=15)
