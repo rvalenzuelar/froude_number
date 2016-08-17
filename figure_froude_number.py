@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import Meteoframes as mf
 import pandas as pd
 import seaborn as sns
+from rv_utilities import discrete_cmap
 
 from matplotlib import rcParams
 rcParams['xtick.labelsize'] = 15
@@ -15,6 +16,9 @@ rcParams['legend.handletextpad'] = 0.1
 rcParams['legend.handlelength'] = 1.
 rcParams['legend.fontsize'] = 15
 rcParams['mathtext.default'] = 'sf'
+
+cmap = discrete_cmap(7, base_cmap='Set1')
+
 
 #home = os.path.expanduser('~')
 home = '/localdata'
@@ -113,23 +117,31 @@ def main():
                       )
         fig, ax = plt.subplots(figsize=(6, 6))
     
-       
-    ax.scatter(Up_c09, medianc09[0], marker='+', s=100, color='b',lw=2,
+    color1 = cmap(0)   
+    color2 = cmap(1)
+    
+    ax.scatter(Up_c09, medianc09[0], marker='+',
+               s=100, color=color1,lw=2,
                label='21-23Jan03 0.5 km'.format(stat))
     
-    ax.scatter(Up_c13, medianc13[0], marker='x', s=100, color='b',lw=2,
-                label='16-18Feb04 0.5 km'.format(stat))
+    ax.scatter(Up_c13, medianc13[0], marker='x',
+               s=100, color=color1,lw=2,
+               label='16-18Feb04 0.5 km'.format(stat))
     
-    ax.scatter(Up_c09, medianc09[1], marker='+', s=100, color='g',lw=2,
+    ax.scatter(Up_c09, medianc09[1], marker='+',
+               s=100, color=color2,lw=2,
                label='21-23Jan03 1.0 km'.format(stat))  
     
-    ax.scatter(Up_c13, medianc13[1], marker='x', s=100, color='g',lw=2,
+    ax.scatter(Up_c13, medianc13[1], marker='x',
+               s=100, color=color2,lw=2,
                 label='16-18Feb04 1.0 km'.format(stat))
 
-    ax.plot(np.arange(21),np.arange(21)/500.,'b--',lw=2,
+    ax.plot(np.arange(21),np.arange(21)/500.,
+            '--',lw=2,color = color1,
             label='h = 0.5 km')    
     
-    ax.plot(np.arange(21),np.arange(21)/1000.,'g-',lw=2,
+    ax.plot(np.arange(21),np.arange(21)/1000.,
+            '-',lw=2,color=color2,
             label='h = 1.0 km') 
 
     ''' arrows annotation '''
@@ -154,13 +166,13 @@ def main():
 
     ''' simple annotations '''
     ax.text(20,0.041,'blocked',weight='bold',ha='right',
-            fontsize=15,rotation=40,color='b')
+            fontsize=15,rotation=40,color=color1)
     ax.text(20,0.037,'unblocked',weight='bold',ha='right',
-            fontsize=15,rotation=40,color='b')
+            fontsize=15,rotation=40,color=color1)
     ax.text(20,0.021,'blocked',weight='bold',ha='right',
-            fontsize=15,rotation=20,color='g')
+            fontsize=15,rotation=20,color=color2)
     ax.text(20,0.017,'unblocked',weight='bold',ha='right',
-            fontsize=15,rotation=20,color='g')
+            fontsize=15,rotation=20,color=color2)
 
 
     ax.set_xlim([minU, maxU])
@@ -175,7 +187,7 @@ def main():
     
 #    plt.show()
     
-    fname='/home/raul/Desktop/froude_number_{}.png'.format(stat)
+    fname='/home/raul/Desktop/fig_froude_number_{}.png'.format(stat)
     plt.savefig(fname, dpi=300, format='png',papertype='letter',
                 bbox_inches='tight')
 
